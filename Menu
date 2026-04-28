@@ -1,0 +1,213 @@
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local TopBar = Instance.new("Frame")
+local Sidebar = Instance.new("Frame")
+local Content = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local TopTitle = Instance.new("TextLabel")
+
+-- Setup Principal
+ScreenGui.Parent = game.CoreGui
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.Position = UDim2.new(0.3, 0, 0.35, 0)
+MainFrame.Size = UDim2.new(0, 400, 0, 260) 
+MainFrame.Active = true
+MainFrame.Draggable = true
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+
+-- Borda RGB
+local FullStroke = Instance.new("UIStroke", MainFrame)
+FullStroke.Thickness = 2
+FullStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- TOP BAR
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.Size = UDim2.new(1, 0, 0, 30)
+TopBar.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 10)
+
+TopTitle.Parent = TopBar
+TopTitle.Size = UDim2.new(0.7, 0, 1, 0)
+TopTitle.Position = UDim2.new(0, 10, 0, 0)
+TopTitle.Text = "RN HUB V1 | Brookhaven RP"
+TopTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+TopTitle.Font = Enum.Font.GothamBold
+TopTitle.TextSize = 12
+TopTitle.TextXAlignment = Enum.TextXAlignment.Left
+TopTitle.BackgroundTransparency = 1
+
+local MinimizeBtn = Instance.new("TextButton", TopBar)
+MinimizeBtn.Text = "-"
+MinimizeBtn.Size = UDim2.new(0, 30, 1, 0)
+MinimizeBtn.Position = UDim2.new(1, -60, 0, 0)
+MinimizeBtn.TextColor3 = Color3.new(1,1,1); MinimizeBtn.BackgroundTransparency = 1; MinimizeBtn.TextSize = 25
+
+local CloseBtn = Instance.new("TextButton", TopBar)
+CloseBtn.Text = "x"
+CloseBtn.Size = UDim2.new(0, 30, 1, 0)
+CloseBtn.Position = UDim2.new(1, -30, 0, 0)
+CloseBtn.TextColor3 = Color3.fromRGB(255, 100, 100); CloseBtn.BackgroundTransparency = 1; CloseBtn.TextSize = 20
+
+-- PAINEL MINIMIZADO RGB
+local MinimizedFrame = Instance.new("TextButton", ScreenGui)
+MinimizedFrame.Size = UDim2.new(0, 250, 0, 40)
+MinimizedFrame.Position = UDim2.new(0.4, 0, 0.05, 0)
+MinimizedFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+MinimizedFrame.Text = "RN HUB V1 | Brookhaven RP"
+MinimizedFrame.TextColor3 = Color3.new(1,1,1)
+MinimizedFrame.Font = Enum.Font.GothamBold
+MinimizedFrame.TextSize = 12
+MinimizedFrame.Visible = false
+MinimizedFrame.Active = true
+MinimizedFrame.Draggable = true
+Instance.new("UICorner", MinimizedFrame)
+local MinStroke = Instance.new("UIStroke", MinimizedFrame)
+MinStroke.Thickness = 2
+
+-- LOOP RGB
+spawn(function()
+    while wait() do
+        local hue = tick() % 5 / 5
+        local color = Color3.fromHSV(hue, 1, 1)
+        FullStroke.Color = color
+        MinStroke.Color = color
+        Title.TextColor3 = color
+    end
+end)
+
+-- Sidebar
+Sidebar.Parent = MainFrame
+Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Sidebar.Position = UDim2.new(0, 0, 0, 30)
+Sidebar.Size = UDim2.new(0, 110, 1, -30)
+Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
+local SideLayout = Instance.new("UIListLayout", Sidebar)
+SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center; SideLayout.Padding = UDim.new(0, 6)
+
+Title.Parent = Sidebar
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "RN HUB V1"
+Title.Font = Enum.Font.GothamBold; Title.TextSize = 13; Title.BackgroundTransparency = 1
+
+-- Conteúdo
+Content.Parent = MainFrame
+Content.Position = UDim2.new(0, 120, 0, 40)
+Content.Size = UDim2.new(0, 270, 0, 210)
+Content.BackgroundTransparency = 1
+
+local Pages = {}
+local function CreatePage(name)
+    local Page = Instance.new("ScrollingFrame", Content); Page.Size = UDim2.new(1, 0, 1, 0)
+    Page.BackgroundTransparency = 1; Page.Visible = false; Page.ScrollBarThickness = 0
+    Instance.new("UIListLayout", Page).Padding = UDim.new(0, 15); Pages[name] = Page
+    return Page
+end
+local pgJogador = CreatePage("Jogador")
+local pgConfig = CreatePage("Config")
+
+local function ShowPage(name)
+    for _, p in pairs(Pages) do p.Visible = false end
+    Pages[name].Visible = true
+end
+
+-- Menu Lateral
+local function AddMenuBtn(text, order)
+    local btn = Instance.new("TextButton", Sidebar)
+    btn.Size = UDim2.new(0.85, 0, 0, 30); btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.Text = text; btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    btn.Font = Enum.Font.GothamSemibold; btn.TextSize = 11; Instance.new("UICorner", btn); btn.LayoutOrder = order
+    btn.MouseButton1Click:Connect(function() ShowPage(text) end)
+end
+AddMenuBtn("Jogador", 1); AddMenuBtn("Avatar", 2); AddMenuBtn("Car", 3); AddMenuBtn("Troll", 4); AddMenuBtn("Config", 5)
+
+-- Lógica Minimizar
+MinimizeBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false; MinimizedFrame.Visible = true end)
+MinimizedFrame.MouseButton1Click:Connect(function() MainFrame.Visible = true; MinimizedFrame.Visible = false end)
+CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+
+-- Slider
+local function CreateSlider(parent, name, min, max, default, callback)
+    local Frame = Instance.new("Frame", parent); Frame.Size = UDim2.new(1, -20, 0, 40); Frame.BackgroundTransparency = 1
+    local Lbl = Instance.new("TextLabel", Frame); Lbl.Text = name .. " [" .. default .. "]"; Lbl.Size = UDim2.new(1, 0, 0, 15)
+    Lbl.TextColor3 = Color3.new(1,1,1); Lbl.BackgroundTransparency = 1; Lbl.TextXAlignment = 0; Lbl.Font = Enum.Font.GothamMedium; Lbl.TextSize = 11
+    local Bar = Instance.new("TextButton", Frame); Bar.Text = ""; Bar.Size = UDim2.new(1, 0, 0, 4); Bar.Position = UDim2.new(0, 0, 0, 25)
+    Bar.BackgroundColor3 = Color3.fromRGB(45, 45, 45); Instance.new("UICorner", Bar)
+    local Fill = Instance.new("Frame", Bar); Fill.Size = UDim2.new((default-min)/(max-min), 0, 1, 0); Fill.BackgroundColor3 = Color3.new(1,1,1)
+    local Ball = Instance.new("Frame", Bar); Ball.Size = UDim2.new(0, 10, 0, 10); Ball.Position = UDim2.new((default-min)/(max-min), -5, 0.5, -5)
+    Ball.BackgroundColor3 = Color3.new(1,1,1); Instance.new("UICorner", Ball).CornerRadius = UDim.new(1, 0)
+    local dragging = false
+    local function update(i)
+        local pos = math.clamp((i.Position.X - Bar.AbsolutePosition.X) / Bar.AbsoluteSize.X, 0, 1)
+        Fill.Size = UDim2.new(pos, 0, 1, 0); Ball.Position = UDim2.new(pos, -5, 0.5, -5)
+        local val = math.floor(min + (max - min) * pos); Lbl.Text = name .. " [" .. val .. "]"; callback(val)
+    end
+    Bar.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then dragging = true; update(i) end end)
+    game:GetService("UserInputService").InputChanged:Connect(function(i) if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then update(i) end end)
+    game:GetService("UserInputService").InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
+end
+
+CreateSlider(pgJogador, "Velocidade", 16, 250, 16, function(v) game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v end)
+CreateSlider(pgJogador, "Pulo", 50, 250, 50, function(v) game.Players.LocalPlayer.Character.Humanoid.JumpPower = v end)
+
+-- PULO INFINITO
+local InfJumpBtn = Instance.new("TextButton", pgJogador)
+InfJumpBtn.Size = UDim2.new(1, -20, 0, 35); InfJumpBtn.Text = "Pulo Infinito: OFF"; InfJumpBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+InfJumpBtn.TextColor3 = Color3.new(1, 1, 1); InfJumpBtn.Font = Enum.Font.GothamBold; InfJumpBtn.TextSize = 11; Instance.new("UICorner", InfJumpBtn)
+local activeJ = false
+InfJumpBtn.MouseButton1Click:Connect(function()
+    activeJ = not activeJ; InfJumpBtn.Text = "Pulo Infinito: " .. (activeJ and "ON" or "OFF")
+    InfJumpBtn.TextColor3 = activeJ and Color3.fromRGB(0, 255, 150) or Color3.new(1, 1, 1)
+end)
+game:GetService("UserInputService").JumpRequest:Connect(function() if activeJ then game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping") end end)
+
+-- LÓGICA FLY REAL
+local FlyBtn = Instance.new("TextButton", pgJogador)
+FlyBtn.Size = UDim2.new(1, -20, 0, 35); FlyBtn.Text = "Fly: OFF"; FlyBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+FlyBtn.TextColor3 = Color3.new(1, 1, 1); FlyBtn.Font = Enum.Font.GothamBold; FlyBtn.TextSize = 11; Instance.new("UICorner", FlyBtn)
+
+local flying = false
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+
+FlyBtn.MouseButton1Click:Connect(function()
+    flying = not flying
+    FlyBtn.Text = "Fly: " .. (flying and "ON" or "OFF")
+    FlyBtn.TextColor3 = flying and Color3.fromRGB(0, 255, 150) or Color3.new(1, 1, 1)
+    
+    local char = player.Character
+    local hum = char:WaitForChild("Humanoid")
+    local root = char:WaitForChild("HumanoidRootPart")
+    
+    if flying then
+        local bv = Instance.new("BodyVelocity", root)
+        bv.Name = "FlyBV"
+        bv.MaxForce = Vector3.new(1, 1, 1) * math.huge
+        bv.Velocity = Vector3.new(0, 0, 0)
+        
+        local bg = Instance.new("BodyGyro", root)
+        bg.Name = "FlyBG"
+        bg.MaxTorque = Vector3.new(1, 1, 1) * math.huge
+        bg.P = 10000
+        bg.CFrame = root.CFrame
+        
+        hum.PlatformStand = true
+        
+        spawn(function()
+            while flying do
+                wait()
+                -- Voa na direção que a câmera aponta usando o WalkSpeed atual
+                bv.Velocity = game.Workspace.CurrentCamera.CFrame.LookVector * hum.WalkSpeed
+                bg.CFrame = game.Workspace.CurrentCamera.CFrame
+            end
+            bv:Destroy()
+            bg:Destroy()
+            hum.PlatformStand = false
+        end)
+    end
+end)
+
+ShowPage("Jogador")
+
